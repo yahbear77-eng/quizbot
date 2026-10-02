@@ -1,0 +1,473 @@
+<!-- __YAHSIAH_KICKWATCH_CLIENT_V2__ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+
+<style>
+#kw-kicked-users-page{
+  --kw-bg:#08050f;
+  --kw-panel:#110d18;
+  --kw-panel2:#151020;
+  --kw-line:#2a2038;
+  --kw-line2:#39294d;
+  --kw-text:#ffffff;
+  --kw-muted:#aaa1b8;
+  --kw-soft:#756c83;
+  --kw-purple:#c9a7ff;
+  --kw-purple2:#9b72e7;
+  --kw-danger:#ff7d9a;
+  color:var(--kw-text);
+  padding-top:34px;
+  padding-bottom:70px;
+}
+#kw-kicked-users-page *{box-sizing:border-box}
+#kw-kicked-users-page .kw-shell{width:min(1180px,calc(100% - 32px));margin:0 auto}
+#kw-kicked-users-page .kw-eyebrow{display:inline-block;color:var(--kw-purple);font-size:10px;letter-spacing:.18em;font-weight:900;text-transform:uppercase}
+#kw-kicked-users-page .kw-head{padding:30px 0 26px}
+#kw-kicked-users-page .kw-head h1{margin:11px 0 12px;font-size:clamp(34px,6vw,62px);line-height:1;letter-spacing:-.045em}
+#kw-kicked-users-page .kw-head h1 span{color:var(--kw-purple)}
+#kw-kicked-users-page .kw-head p{max-width:720px;margin:0;color:var(--kw-muted);font-size:14px;line-height:1.65}
+#kw-kicked-users-page .kw-realtime{display:inline-flex;align-items:center;gap:8px;margin-top:17px;padding:7px 10px;border:1px solid var(--kw-line2);border-radius:999px;background:rgba(201,167,255,.07);color:#d8c6f5;font-size:11px}
+#kw-kicked-users-page .kw-dot{width:7px;height:7px;border-radius:50%;background:#8df0b4;box-shadow:0 0 12px rgba(141,240,180,.6)}
+#kw-kicked-users-page .kw-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 18px}
+#kw-kicked-users-page .kw-stat{padding:20px;border:1px solid var(--kw-line);border-radius:15px;background:linear-gradient(180deg,var(--kw-panel2),var(--kw-panel))}
+#kw-kicked-users-page .kw-stat-label{color:var(--kw-muted);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+#kw-kicked-users-page .kw-stat-value{margin-top:10px;font-size:clamp(32px,5vw,48px);font-weight:900;letter-spacing:-.045em}
+#kw-kicked-users-page .kw-stat-foot{margin-top:12px;color:var(--kw-soft);font-size:10px}
+#kw-kicked-users-page .kw-search-panel{border:1px solid var(--kw-line);border-radius:16px;background:var(--kw-panel);overflow:hidden}
+#kw-kicked-users-page .kw-search-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;padding:20px;border-bottom:1px solid var(--kw-line)}
+#kw-kicked-users-page .kw-search-top h2{margin:0 0 5px;font-size:18px}
+#kw-kicked-users-page .kw-search-top p{margin:0;color:var(--kw-muted);font-size:11px}
+#kw-kicked-users-page .kw-input{width:min(360px,100%);padding:11px 13px;border:1px solid var(--kw-line2);border-radius:10px;background:#0d0913;color:#fff;outline:none}
+#kw-kicked-users-page .kw-input:focus{border-color:var(--kw-purple2);box-shadow:0 0 0 3px rgba(155,114,231,.12)}
+#kw-kicked-users-page .kw-preview{display:none;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin:16px 20px;padding:15px;border:1px solid var(--kw-line2);border-radius:13px;background:rgba(201,167,255,.045)}
+#kw-kicked-users-page .kw-preview.show{display:grid}
+#kw-kicked-users-page .kw-preview-avatar{width:68px;height:68px;border-radius:14px;object-fit:cover;border:1px solid var(--kw-line2);background:#171021}
+#kw-kicked-users-page .kw-preview strong{display:block;font-size:16px}
+#kw-kicked-users-page .kw-preview span{display:block;color:var(--kw-muted);font-size:11px;margin-top:4px}
+#kw-kicked-users-page .kw-preview-id{text-align:right;color:var(--kw-purple);font-size:11px;font-weight:800}
+#kw-kicked-users-page .kw-feed-head{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-top:1px solid var(--kw-line);border-bottom:1px solid var(--kw-line);gap:10px}
+#kw-kicked-users-page .kw-feed-head strong{font-size:12px}
+#kw-kicked-users-page .kw-feed-head span{font-size:10px;color:var(--kw-soft)}
+#kw-kicked-users-page .kw-scroll{max-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#49345f #0c0911}
+#kw-kicked-users-page .kw-row{display:grid;grid-template-columns:minmax(240px,1.3fr) minmax(220px,1.7fr) auto;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid #21182e;cursor:pointer;transition:background .15s ease}
+#kw-kicked-users-page .kw-row:hover{background:rgba(201,167,255,.045)}
+#kw-kicked-users-page .kw-row:last-child{border-bottom:0}
+#kw-kicked-users-page .kw-player{display:flex;align-items:center;gap:12px;min-width:0}
+#kw-kicked-users-page .kw-avatar{width:48px;height:48px;border-radius:11px;object-fit:cover;border:1px solid var(--kw-line2);background:#171021;flex:0 0 auto}
+#kw-kicked-users-page .kw-player strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kw-kicked-users-page .kw-player span{display:block;color:var(--kw-soft);font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kw-kicked-users-page .kw-badge{display:inline-block;padding:3px 7px;border:1px solid #553044;border-radius:5px;background:#28131e;color:#ff9bb2;font-size:8px;font-weight:900;letter-spacing:.11em}
+#kw-kicked-users-page .kw-msg{display:block;margin-top:6px;color:var(--kw-muted);font-size:11px;overflow-wrap:anywhere}
+#kw-kicked-users-page .kw-time{text-align:right;white-space:nowrap}
+#kw-kicked-users-page .kw-time strong{display:block;font-size:11px}
+#kw-kicked-users-page .kw-time span{display:block;margin-top:4px;color:var(--kw-soft);font-size:9px}
+#kw-kicked-users-page .kw-empty{padding:40px 20px;text-align:center;color:var(--kw-muted)}
+#kw-nav-kicked-users[aria-current="page"]{color:#c9a7ff!important}
+@media(max-width:800px){
+  #kw-kicked-users-page .kw-stats{grid-template-columns:1fr}
+  #kw-kicked-users-page .kw-search-top{grid-template-columns:1fr}
+  #kw-kicked-users-page .kw-input{width:100%}
+  #kw-kicked-users-page .kw-row{grid-template-columns:1fr auto}
+  #kw-kicked-users-page .kw-event{grid-column:1/3;padding-left:60px}
+  #kw-kicked-users-page .kw-time{grid-row:1;grid-column:2}
+  #kw-kicked-users-page .kw-preview{grid-template-columns:auto 1fr}
+  #kw-kicked-users-page .kw-preview-id{grid-column:2;text-align:left}
+}
+</style>
+
+<script>
+(() => {
+  const SUPABASE_URL = "https://htyjctaelgzcxppwdpyw.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_j20wqbtbmHrFVNHxeGREig_OfmQzPIr";
+  const FUNCTIONS = SUPABASE_URL.replace(/\/$/, '') + '/functions/v1';
+  const KICK_PATH = '/kicked-users';
+
+  let client = null;
+  let channel = null;
+  let rows = [];
+  let query = '';
+  let selectedUserId = null;
+  let timersStarted = false;
+
+  let stats = {
+    banned_users: 0,
+    online_users: 0,
+    banned_today: 0,
+    latest_event_at: null
+  };
+
+  function safe(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (c) => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[c]));
+  }
+
+  function ago(iso) {
+    if (!iso) return '—';
+    const seconds = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+    if (seconds < 5) return 'just now';
+    if (seconds < 60) return seconds + 's ago';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    return Math.floor(seconds / 86400) + 'd ago';
+  }
+
+  function findForumsControl() {
+    const controls = Array.from(
+      document.querySelectorAll('header a, nav a, header button, nav button')
+    );
+
+    return controls.find((el) =>
+      (el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase() === 'forums'
+    ) || null;
+  }
+
+  function installNavButton() {
+    if (document.getElementById('kw-nav-kicked-users')) return;
+
+    const forums = findForumsControl();
+    if (!forums || !forums.parentElement) return;
+
+    const clone = forums.cloneNode(true);
+    clone.id = 'kw-nav-kicked-users';
+    clone.textContent = 'View Kicked Users';
+    clone.removeAttribute('data-route');
+    clone.removeAttribute('onclick');
+
+    if (clone.tagName === 'A') {
+      clone.setAttribute('href', KICK_PATH);
+    } else {
+      clone.addEventListener('click', () => {
+        window.location.href = KICK_PATH;
+      });
+    }
+
+    if (location.pathname === KICK_PATH) {
+      clone.setAttribute('aria-current', 'page');
+    }
+
+    forums.insertAdjacentElement('afterend', clone);
+  }
+
+  function mainElement() {
+    return document.querySelector('main#app') || document.querySelector('main');
+  }
+
+  function pageHtml() {
+    return `
+      <section id="kw-kicked-users-page">
+        <div class="kw-shell">
+          <div class="kw-head">
+            <span class="kw-eyebrow">YAHSIAH.WTF • KICKWATCH</span>
+            <h1>Kicked <span>Users</span></h1>
+            <p>Live global script presence and observed kick history. Search by Roblox username or UserId, inspect the current avatar, and scroll through recent kicked users.</p>
+            <div class="kw-realtime"><span class="kw-dot"></span><span data-kw="connection">Connecting to realtime…</span></div>
+          </div>
+
+          <section class="kw-stats">
+            <article class="kw-stat">
+              <div class="kw-stat-label">Banned Users</div>
+              <div class="kw-stat-value" data-kw="banned">0</div>
+              <div class="kw-stat-foot">Unique Roblox users recorded all time</div>
+            </article>
+
+            <article class="kw-stat">
+              <div class="kw-stat-label">Online Users</div>
+              <div class="kw-stat-value" data-kw="online">0</div>
+              <div class="kw-stat-foot">Unique script users active in the last 90 seconds</div>
+            </article>
+
+            <article class="kw-stat">
+              <div class="kw-stat-label">Banned Today</div>
+              <div class="kw-stat-value" data-kw="today">0</div>
+              <div class="kw-stat-foot">Unique Roblox users observed kicked today (UTC)</div>
+            </article>
+          </section>
+
+          <section class="kw-search-panel">
+            <div class="kw-search-top">
+              <div>
+                <h2>Player Search</h2>
+                <p>Search username, display name or Roblox UserId.</p>
+              </div>
+              <input class="kw-input" data-kw="search" placeholder="Search username or User ID">
+            </div>
+
+            <div class="kw-preview" data-kw="preview"></div>
+
+            <div class="kw-feed-head">
+              <strong>Kicked Users</strong>
+              <span>Realtime • newest first • scroll for history</span>
+            </div>
+
+            <div class="kw-scroll" data-kw="rows">
+              <div class="kw-empty">Loading kicked users…</div>
+            </div>
+          </section>
+        </div>
+      </section>
+    `;
+  }
+
+  function ensureKickPage() {
+    installNavButton();
+
+    if (location.pathname !== KICK_PATH) return;
+
+    document.title = 'Kicked Users — yahsiah.wtf';
+
+    const main = mainElement();
+    if (!main) return;
+
+    if (!main.querySelector('#kw-kicked-users-page')) {
+      main.innerHTML = pageHtml();
+      bindPage();
+      renderAll();
+    }
+
+    startBackend();
+  }
+
+  function root() {
+    return document.getElementById('kw-kicked-users-page');
+  }
+
+  function field(name) {
+    return root()?.querySelector('[data-kw="' + name + '"]') || null;
+  }
+
+  function setText(name, value) {
+    const el = field(name);
+    if (el) el.textContent = value;
+  }
+
+  function filteredRows() {
+    if (!query) return rows;
+
+    return rows.filter((row) =>
+      String(row.username || '').toLowerCase().includes(query) ||
+      String(row.display_name || '').toLowerCase().includes(query) ||
+      String(row.roblox_user_id || '').includes(query)
+    );
+  }
+
+  function selectedRow() {
+    const visible = filteredRows();
+
+    if (selectedUserId != null) {
+      const exact = visible.find((row) => Number(row.roblox_user_id) === Number(selectedUserId));
+      if (exact) return exact;
+    }
+
+    return visible[0] || null;
+  }
+
+  function avatarUrl(userId) {
+    return FUNCTIONS + '/kickwatch-avatar?userId=' + encodeURIComponent(userId);
+  }
+
+  function renderStats() {
+    setText('banned', Number(stats.banned_users || stats.unique_players || 0).toLocaleString());
+    setText('online', Number(stats.online_users || 0).toLocaleString());
+    setText('today', Number(stats.banned_today || 0).toLocaleString());
+  }
+
+  function renderPreview() {
+    const preview = field('preview');
+    if (!preview) return;
+
+    const row = selectedRow();
+
+    if (!row || !query) {
+      preview.classList.remove('show');
+      preview.innerHTML = '';
+      return;
+    }
+
+    preview.classList.add('show');
+    preview.innerHTML = `
+      <img class="kw-preview-avatar" src="${avatarUrl(row.roblox_user_id)}" alt="${safe(row.username)} Roblox avatar">
+      <div>
+        <strong>${safe(row.display_name || row.username)}</strong>
+        <span>@${safe(row.username)}</span>
+        <span>Last observed kick: ${ago(row.observed_at)}</span>
+      </div>
+      <div class="kw-preview-id">User ID ${safe(row.roblox_user_id)}</div>
+    `;
+  }
+
+  function renderRows() {
+    const container = field('rows');
+    if (!container) return;
+
+    const visible = filteredRows();
+
+    if (!visible.length) {
+      container.innerHTML = '<div class="kw-empty">No kicked users match that search.</div>';
+      renderPreview();
+      return;
+    }
+
+    container.innerHTML = visible.map((row) => `
+      <div class="kw-row" data-user-id="${safe(row.roblox_user_id)}">
+        <div class="kw-player">
+          <img class="kw-avatar" src="${avatarUrl(row.roblox_user_id)}" alt="${safe(row.username)} Roblox avatar" loading="lazy">
+          <div style="min-width:0">
+            <strong>${safe(row.display_name || row.username)}</strong>
+            <span>@${safe(row.username)} • User ID ${safe(row.roblox_user_id)}</span>
+          </div>
+        </div>
+
+        <div class="kw-event">
+          <span class="kw-badge">KICKED</span>
+          <span class="kw-msg">${safe(row.message || row.reason || 'Physics Crash')}</span>
+        </div>
+
+        <div class="kw-time">
+          <strong>${ago(row.observed_at)}</strong>
+          <span>observed</span>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.kw-row').forEach((el) => {
+      el.addEventListener('click', () => {
+        selectedUserId = Number(el.getAttribute('data-user-id'));
+        renderPreview();
+      });
+    });
+
+    renderPreview();
+  }
+
+  function renderAll() {
+    renderStats();
+    renderRows();
+  }
+
+  function bindPage() {
+    const search = field('search');
+    if (!search) return;
+
+    search.addEventListener('input', (event) => {
+      query = String(event.target.value || '').trim().toLowerCase();
+      selectedUserId = null;
+      renderRows();
+    });
+  }
+
+  async function refreshStats() {
+    try {
+      const response = await fetch(FUNCTIONS + '/kickwatch-stats', {
+        cache: 'no-store'
+      });
+
+      if (!response.ok) throw new Error('stats HTTP ' + response.status);
+
+      const body = await response.json();
+      stats = body.stats || body || stats;
+      renderStats();
+    } catch (error) {
+      console.warn('[KickWatch stats]', error);
+    }
+  }
+
+  async function loadRows() {
+    if (!client) return;
+
+    const { data, error } = await client
+      .from('kickwatch_events')
+      .select('id,roblox_user_id,username,display_name,reason,message,observed_at')
+      .order('observed_at', { ascending: false })
+      .limit(500);
+
+    if (!error && Array.isArray(data)) {
+      rows = data;
+      renderRows();
+    }
+  }
+
+  function startBackend() {
+    if (location.pathname !== KICK_PATH) return;
+    if (!window.supabase || !SUPABASE_URL || !SUPABASE_KEY) {
+      setText('connection', 'Realtime unavailable');
+      return;
+    }
+
+    if (!client) {
+      client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
+        }
+      });
+    }
+
+    if (!channel) {
+      channel = client
+        .channel('yahsiah-kicked-users')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'kickwatch_events'
+          },
+          (payload) => {
+            const row = payload.new;
+            rows = [row, ...rows.filter((item) => item.id !== row.id)].slice(0, 500);
+            renderRows();
+            refreshStats();
+          }
+        )
+        .subscribe((status) => {
+          setText(
+            'connection',
+            status === 'SUBSCRIBED'
+              ? 'Realtime connected'
+              : status
+          );
+        });
+    }
+
+    loadRows();
+    refreshStats();
+
+    if (!timersStarted) {
+      timersStarted = true;
+
+      setInterval(refreshStats, 5000);
+
+      setInterval(() => {
+        if (location.pathname === KICK_PATH) {
+          renderRows();
+        }
+      }, 1000);
+    }
+  }
+
+  function start() {
+    installNavButton();
+    ensureKickPage();
+
+    const observer = new MutationObserver(() => {
+      installNavButton();
+      ensureKickPage();
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
+})();
+</script>
